@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>고양이 가라사대</title>
+  </head>
+  <style>
+    body {
+      text-align: center;
+    }
+    .main-card button {
+      position: relative;
+      left: -45px;
+      bottom: 15px;
+    }
+    .favorites {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .favorites img {
+      width: 150px;
+    }
+  </style>
+  <body>
+    <div id="app"></div>
+    <!-- <ul class="favorites">
+      <li>
+        <img
+          src="https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react"
+          alt="고양이"
+        />
+      </li>
+      <li>
+        <img
+          src="https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react"
+          alt="고양이"
+        />
+      </li>
+      <li>
+        <img
+          src="https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react"
+          alt="고양이"
+        />
+      </li>
+    </ul> -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="text/babel">
+      console.log("야옹");
+
+      const jsonLocalStorage = {
+        setItem: (key, value) => {
+          localStorage.setItem(key, JSON.stringify(value));
+        },
+        getItem: (key) => {
+          return JSON.parse(localStorage.getItem(key));
+        },
+      };
+      
+      function CatItem(props) {
+        return (
+          <li>
+            <img src={props.img}/>
+          </li>
+        );
+      }
+
+      function Favorites({favorites}) {
+        return (
+          <ul className="favorites">
+            {favorites.map((cat) => (
+              <CatItem img={cat} key={cat}/>  
+            ))}
+          </ul>
+        );
+      }
+
+      const Title = (props) => {
+        return (
+          <div>
+            <h1>{props.children}</h1>
+          </div>
+        );
+      }
+
+      const Form = ({updateMainCat}) => {
+        const includesHangul = (text) => /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/i.test(text);
+        const [value, setValue] = React.useState("");
+        const [errorMessage, setErrorMessage] = React.useState("");
+        function handleInputChange(e) {
+          setValue(e.target.value.toUpperCase());
+          setErrorMessage("");
+          if(includesHangul(value)) {
+            setErrorMessage("한글은 입력할 수 없습니다.");
+          }
+        }
+        function handlerFormSubmit(e) {
+          e.preventDefault();
+          setErrorMessage("");
+
+          if(value === ""){
+            setErrorMessage("빈 값으로 만들 수 없습니다.");
+            return;
+          }
+
+          updateMainCat();
+        }
+        
+        return (
+          <div>
+            <form onSubmit={handlerFormSubmit}>
+              <input 
+                type="text" 
+                name="name" 
+                onChange={handleInputChange} 
+                value={value}
+                placeholder="영어 대사를 입력해주세요" />
+              <button type="submit">생성</button>
+              <p style={{color:"red"}}>{errorMessage}</p>
+            </form>
+          </div>
+        );
+      }
+
+      const MainCard = ({img, onHeartClick}) => {
+        return (
+          <div className="main-card">
+            <img
+              src={img}
+              alt="고양이"
+              width="400"
+            />
+            <button 
+              onClick={onHeartClick}
+            >🤍</button>
+          </div>
+        );
+      }
+
+      const App = () => {/*
+        const CAT1 = "https://cdn.straightnews.co.kr/news/photo/202409/253829_158493_3815.jpg"
+        const CAT2 = "https://cdn.mhnse.com/news/photo/202409/320788_361963_2612.jpg"
+        const CAT3 = "https://blog.kakaocdn.net/dn/ST84c/btsDhUN8AZg/MiQi2njlGookkbMaKwPlo1/img.jpg" */
+
+        const CAT1 = "https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react";
+        const CAT2 = "https://cataas.com/cat/BxqL2EjFmtxDkAm2/says/inflearn";
+        const CAT3 = "https://cataas.com/cat/18MD6byVC1yKGpXp/says/JavaScript";
+
+        const [counter, setCounter] = React.useState(jsonLocalStorage.getItem("counter"));
+        const [mainImage, setmainImage] = React.useState(CAT1);
+        const [favorites, setFavorites] = React.useState(jsonLocalStorage.getItem("favorites") || []);
+
+        console.log("카운터 : " + counter);
+
+        function updateMainCat() {
+          setmainImage(CAT2);
+          const nextCounter = counter + 1;
+          setCounter(counter+1);
+          jsonLocalStorage.setItem("counter", nextCounter);
+        }
+
+        function handleHeartClick() {
+          console.log("하트 눌렀음");
+          const nextFavorites = [...favorites, mainImage];
+          setFavorites(nextFavorites);
+          jsonLocalStorage.setItem("favorites", nextFavorites);
+        }
+        
+        return (
+          <div>
+            <Title>{counter}번째 고양이 가라사대</Title>
+            <Form updateMainCat={updateMainCat}/>
+            <MainCard img={mainImage} onHeartClick={handleHeartClick}></MainCard>
+            <Favorites favorites={favorites}/> 
+          </div>
+        );
+      }
+
+      const 여기다가그려 = document.querySelector("#app");
+
+      ReactDOM.render(<App />, 여기다가그려);
+    </script>
+  </body>
+</html>
